@@ -51,6 +51,12 @@ def run(flags_obj):
   Returns:
     Dictionary of training and eval stats.
   """
+
+  # KungFu
+  kungfu_spec = os.getenv("KUNGFU_SELF_SPEC")
+  kungfu_spec = kungfu_spec.replace(":", "-")
+  flags_obj.model_dir = os.path.join(flags_obj.model_dir, kungfu_spec)
+
   keras_utils.set_session_config(
       enable_eager=flags_obj.enable_eager,
       enable_xla=flags_obj.enable_xla)
@@ -210,6 +216,10 @@ def run(flags_obj):
     elif flags_obj.pruning_method:
       raise NotImplementedError(
           'Only polynomial_decay is currently supported.')
+
+    # KungFu
+    from kungfu.tensorflow.optimizers import SynchronousSGDOptimizer
+    optimizer = SynchronousSGDOptimizer(optimizer)
 
     model.compile(
         loss='sparse_categorical_crossentropy',
